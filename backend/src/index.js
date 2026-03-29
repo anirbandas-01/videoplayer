@@ -8,10 +8,23 @@ dotenv.config({
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
 
+import http from "http";
+import { Server  } from "socket.io";
+
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+    },
+});
+
+app.set("io", io);
 
 connectDB()
        .then( () => {
-        app.listen(process.env.PORT || 8000, () => {
+        server.listen(process.env.PORT || 8000, () => {
             console.log(`server is running at port: ${process.env.PORT}`);
     })
 })
