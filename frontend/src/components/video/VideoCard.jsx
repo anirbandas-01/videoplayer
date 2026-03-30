@@ -96,8 +96,15 @@ const VideoCard = ({ video, onDelete, onVideoUpdate }) => {
     }
   };
 
-  const canDelete = user?.role === 'admin' || localVideo.owner?._id === user?.id;
-  const canView = user?.role !== 'viewer' || localVideo.owner?._id === user?.id;
+  // ✅ FIXED PERMISSIONS
+  const isOwner = localVideo.owner?._id === user?.id;
+  const isAdmin = user?.role === 'admin';
+
+  // ✅ ALL users in the organization can watch videos (including viewers)
+  const canWatch = true;
+
+  // ✅ Only owner or admin can delete
+  const canDelete = isOwner || isAdmin;
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4">
@@ -150,7 +157,8 @@ const VideoCard = ({ video, onDelete, onVideoUpdate }) => {
       )}
 
       <div className="flex gap-2">
-        {canView && localVideo.status !== 'processing' && (
+        {/* ✅ ALL users can watch if not processing */}
+        {canWatch && localVideo.status !== 'processing' && (
           <a
             href={`/dashboard?video=${localVideo._id}`}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-md text-sm font-medium transition-colors"
@@ -158,6 +166,8 @@ const VideoCard = ({ video, onDelete, onVideoUpdate }) => {
             Watch
           </a>
         )}
+
+        {/* ✅ Only owner or admin can delete */}
         {canDelete && (
           <button
             onClick={handleDelete}

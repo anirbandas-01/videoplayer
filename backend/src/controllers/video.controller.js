@@ -153,13 +153,6 @@ const getVideoById = async (req, res) => {
             });
         }
 
-        if(req.user.role === "viewer" && video.owner.toString() !== req.user._id.toString()){
-            return res.status(403).json({
-                success: false,
-                message: "Access denied, Viewers can only access their own videos."
-            });
-        }
-
         return res.status(200).json({
             success: true,
             video,
@@ -242,13 +235,6 @@ const streamVideo = async (req, res) => {
             });
         }
         
-        if(req.user.role === "viewer" && video.owner.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied. Viewers can only stream their own videos."
-            });
-        }
-
         const videoPath = path.resolve(video.videoFile);
         
         if (!fs.existsSync(videoPath)) {
