@@ -22,8 +22,8 @@ const io = new Server(server, {
     },
 });
 
-io.on("connection", (Socket) => {
-    console.log("New client connected:", Socket.id);
+io.on("connection", (socket) => {
+    console.log("New client connected:", socket.id);
 
     const token = socket.handshake.auth.token;
 
@@ -36,7 +36,7 @@ io.on("connection", (Socket) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
-        socket.join(`user_${decoded._id}`);
+        socket.join(`user_${decoded.id}`);
 
         socket.join(`org_${decoded.organizationId}`);
 

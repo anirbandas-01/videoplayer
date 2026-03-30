@@ -34,7 +34,7 @@ const uploadVideo = async (req, res) =>{
             organizationId: req.user.organizationId,
             status: "processing",
             fileSize: fileSize,
-            mimeType: file.mimeType,
+            mimeType: file.mimetype,
             processingProgress: 0
         });
 
@@ -195,7 +195,7 @@ const deleteVideo = async (req, res) => {
         }
         
         const isOwner = video.owner.toString() === req.user._id.toString();
-        const isAdmin = req.user.role === "Admin";
+        const isAdmin = req.user.role === "admin";
 
         if(!isOwner && !isAdmin){
             return res.status(403).json({
@@ -298,7 +298,7 @@ const streamVideo = async (req, res) => {
 
 const getFilteredVideos = async (req, res) => {
     try {
-        const { status, sortBy, search } = req.body;
+        const { status, sortBy, search } = req.query;
 
         let filter = { organizationId: req.user.organizationId };
 
@@ -307,7 +307,7 @@ const getFilteredVideos = async (req, res) => {
         }
 
         if(search){
-            filter.title = { $regex: search, $options: "1" };
+            filter.title = { $regex: search, $options: "i" };
         }
 
         let sortOption = {};
