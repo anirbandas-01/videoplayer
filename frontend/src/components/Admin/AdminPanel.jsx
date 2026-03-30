@@ -210,7 +210,7 @@ const AdminPanel = () => {
                 </div>
               </div>
 
-              {/* Video Stats */}
+              
               <div className="bg-green-50 rounded-lg p-6 border border-green-200">
                 <h3 className="text-lg font-semibold text-green-900 mb-4">Videos</h3>
                 <div className="space-y-3">
@@ -234,7 +234,7 @@ const AdminPanel = () => {
               </div>
             </div>
 
-            {/* Visual representation */}
+            
             <div className="mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Video Status Distribution</h3>
               <div className="flex gap-2 h-8 rounded-lg overflow-hidden">
@@ -266,9 +266,9 @@ const AdminPanel = () => {
                 )}
               </div>
               <div className="flex justify-between mt-2 text-xs text-gray-600">
-                <span>🟡 Processing</span>
-                <span>🟢 Safe</span>
-                <span>🔴 Flagged</span>
+                <span>Processing</span>
+                <span>Safe</span>
+                <span>Flagged</span>
               </div>
             </div>
           </div>

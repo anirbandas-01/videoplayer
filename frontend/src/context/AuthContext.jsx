@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       const response = await getCurrentUser();
       setUser(response.data.user);
       
-      // Initialize socket
+      
       const token = localStorage.getItem('token');
       initializeSocket(token);
       

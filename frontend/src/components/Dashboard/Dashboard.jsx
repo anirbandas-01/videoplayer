@@ -49,7 +49,7 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Navigation Tabs */}
+          
           {isAdmin && (
             <div className="mb-6 border-b border-gray-200">
               <nav className="flex -mb-px space-x-8">
@@ -77,22 +77,22 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Content based on active view */}
+          
           {activeView === 'videos' ? (
             <>
-              {/* Upload Section - Only for Editor and Admin */}
+              
               {canUpload && (
                 <VideoUpload onUploadSuccess={handleUploadSuccess} />
               )}
 
-              {/* Video List */}
+              
               <VideoList refreshTrigger={refreshTrigger} />
             </>
           ) : (
             <AdminPanel />
           )}
 
-          {/* Video Player Modal */}
+          
           {selectedVideoId && (
             <VideoPlayer
               videoId={selectedVideoId}

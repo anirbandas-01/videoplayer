@@ -29,7 +29,7 @@ export const getAllVideos = () => API.get('/videos');
 export const getFilteredVideos = (params) => API.get('/videos/filter', { params });
 export const getVideoById = (id) => API.get(`/videos/${id}`);
 export const deleteVideo = (id) => API.delete(`/videos/${id}`);
-/* export const getStreamUrl = (id) => `http://localhost:8000/api/v1/videos/stream/${id}`; */
+
 
 
 export const getAllUsers = () => API.get('/admin/users');

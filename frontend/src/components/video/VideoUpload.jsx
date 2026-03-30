@@ -13,14 +13,14 @@ const VideoUpload = ({ onUploadSuccess }) => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // Validate file type
+      
       const validTypes = ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska', 'video/webm'];
       if (!validTypes.includes(selectedFile.type)) {
         setError('Invalid file type. Please upload a video file.');
         return;
       }
       
-      // Validate file size (500MB)
+      
       if (selectedFile.size > 500 * 1024 * 1024) {
         setError('File size exceeds 500MB limit.');
         return;
@@ -54,7 +54,7 @@ const VideoUpload = ({ onUploadSuccess }) => {
         setUploadProgress(progress);
       });
 
-      // Reset form
+      
       setFile(null);
       setTitle('');
       setDescription('');
@@ -64,7 +64,7 @@ const VideoUpload = ({ onUploadSuccess }) => {
         onUploadSuccess(response.data.video);
       }
 
-      // Show success message
+      
       alert('Video uploaded successfully! Processing will start shortly.');
     } catch (err) {
       setError(err.response?.data?.message || 'Upload failed');

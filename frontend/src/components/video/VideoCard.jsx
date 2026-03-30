@@ -82,13 +82,13 @@ const VideoCard = ({ video, onDelete, onVideoUpdate }) => {
       case 'safe':
         return (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-            ✓ Safe
+            Safe
           </span>
         );
       case 'flagged':
         return (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-            ⚠ Flagged
+            Flagged
           </span>
         );
       default:
@@ -96,14 +96,14 @@ const VideoCard = ({ video, onDelete, onVideoUpdate }) => {
     }
   };
 
-  // ✅ FIXED PERMISSIONS
+
   const isOwner = localVideo.owner?._id === user?.id;
   const isAdmin = user?.role === 'admin';
 
-  // ✅ ALL users in the organization can watch videos (including viewers)
+  
   const canWatch = true;
 
-  // ✅ Only owner or admin can delete
+  
   const canDelete = isOwner || isAdmin;
 
   return (
@@ -157,7 +157,7 @@ const VideoCard = ({ video, onDelete, onVideoUpdate }) => {
       )}
 
       <div className="flex gap-2">
-        {/* ✅ ALL users can watch if not processing */}
+        
         {canWatch && localVideo.status !== 'processing' && (
           <a
             href={`/dashboard?video=${localVideo._id}`}
@@ -167,7 +167,7 @@ const VideoCard = ({ video, onDelete, onVideoUpdate }) => {
           </a>
         )}
 
-        {/* ✅ Only owner or admin can delete */}
+        
         {canDelete && (
           <button
             onClick={handleDelete}
