@@ -3,7 +3,9 @@ import { io } from 'socket.io-client';
 let socket = null;
 
 export const initializeSocket = (token) => {
-  socket = io('http://localhost:8000', {
+  const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:8000';
+  
+  socket = io(socketUrl, {
     auth: { token }
   });
 

@@ -7,6 +7,7 @@ const VideoPlayer = ({ videoId, onClose }) => {
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [videoUrl, setVideoUrl] = useState(null);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -15,6 +16,14 @@ const VideoPlayer = ({ videoId, onClose }) => {
     }
   }, [videoId]);
 
+  useEffect(() => {
+    return () => {
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+      }
+    };
+  }, [videoUrl]);
+
   const fetchVideoDetails = async () => {
     setLoading(true);
     setError('');
@@ -22,6 +31,10 @@ const VideoPlayer = ({ videoId, onClose }) => {
     try {
       const response = await getVideoById(videoId);
       setVideo(response.data.video);
+      
+      if (response.data.video.status !== 'processing') {
+        await fetchVideoStream(videoId);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load video');
     } finally {
@@ -29,9 +42,29 @@ const VideoPlayer = ({ videoId, onClose }) => {
     }
   };
 
-  const getStreamUrl = () => {
-    const token = localStorage.getItem('token');
-    return `http://localhost:8000/api/v1/videos/stream/${videoId}?token=${token}`;
+  const fetchVideoStream = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+      const streamUrl = `${baseUrl.replace('/api/v1', '')}/api/v1/videos/stream/${id}`;
+      
+      const response = await fetch(streamUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch video stream');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setVideoUrl(url);
+    } catch (err) {
+      console.error('Error fetching video stream:', err);
+      setError('Failed to load video stream. Please try again.');
+    }
   };
 
   if (!videoId) return null;
@@ -69,7 +102,6 @@ const VideoPlayer = ({ videoId, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="flex justify-between items-start p-6 border-b">
           <div className="flex-1">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -87,7 +119,6 @@ const VideoPlayer = ({ videoId, onClose }) => {
           </button>
         </div>
 
-        {/* Video Player */}
         <div className="p-6">
           {video.status === 'processing' ? (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
@@ -117,7 +148,7 @@ const VideoPlayer = ({ videoId, onClose }) => {
               <p className="text-red-700 mb-4">
                 {video.flagReason || 'This video has been flagged for potential sensitive content.'}
               </p>
-              {(user?.role === 'admin' || user?.role === 'editor') && (
+              {(user?.role === 'admin' || user?.role === 'editor') && videoUrl && (
                 <div className="mt-6">
                   <p className="text-sm text-gray-600 mb-4">
                     As an {user.role}, you can still view this content:
@@ -125,30 +156,33 @@ const VideoPlayer = ({ videoId, onClose }) => {
                   <video
                     ref={videoRef}
                     controls
+                    src={videoUrl}
                     className="w-full rounded-lg shadow-lg"
                     style={{ maxHeight: '60vh' }}
                   >
-                    <source src={getStreamUrl()} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 </div>
               )}
             </div>
-          ) : (
+          ) : videoUrl ? (
             <video
               ref={videoRef}
               controls
               autoPlay
+              src={videoUrl}
               className="w-full rounded-lg shadow-lg"
               style={{ maxHeight: '60vh' }}
             >
-              <source src={getStreamUrl()} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
+          ) : (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
           )}
         </div>
 
-        {/* Video Info */}
         <div className="px-6 pb-6 border-t pt-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>

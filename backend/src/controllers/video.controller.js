@@ -264,9 +264,16 @@ const streamVideo = async (req, res) => {
         const range = req.headers.range;
 
         if(!range){
-            return res.status(400).json({
-                message: "Range header require"
-            });
+            const headers = {
+                "Content-Length": filesize,
+                "Content-Type": video.mimeType || "video/mp4",
+                "Accept-Ranges": "bytes"
+            };
+
+            res.writeHead(200, headers);
+            const stream = fs.createReadStream(videoPath);
+            stream.pipe(res);
+            return;
         }
 
         const CHUNK_SIZE = 10 ** 6;
@@ -279,7 +286,7 @@ const streamVideo = async (req, res) => {
             "Content-Range" : `bytes ${start}-${end}/${filesize}`,
             "Accept-Ranges" : "bytes",
             "Content-Length" : contentLength,
-            "Content-Type" : "video/mp4"
+            "Content-Type" :  video.mimeType || "video/mp4"
         };
 
         res.writeHead(206, headers);
@@ -295,6 +302,7 @@ const streamVideo = async (req, res) => {
         });
     }
 };
+
 
 const getFilteredVideos = async (req, res) => {
     try {
