@@ -31,45 +31,81 @@ app.use("/api/v1/admin", adminRouter);
 
 app.get("/api-docs", (req, res) => {
   res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>API Docs</title>
-      <style>
-        body {
-          font-family: Arial;
-          padding: 20px;
-          background: #0f172a;
-          color: white;
-        }
-        h1 { color: #38bdf8; }
-        h2 { margin-top: 20px; }
-        ul { line-height: 1.8; }
-        li { color: #e2e8f0; }
-      </style>
-    </head>
-    <body>
-      <h1>🚀 API Documentation</h1>
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>API Docs</title>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 20px;
+        background: #0f172a;
+        color: white;
+      }
+      h1 { color: #38bdf8; }
+      h2 { margin-top: 30px; color: #22c55e; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th, td {
+        border: 1px solid #334155;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background: #1e293b;
+      }
+      tr:hover {
+        background: #1e293b;
+      }
+      .method {
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 5px;
+      }
+      .get { background: #22c55e; }
+      .post { background: #3b82f6; }
+      .patch { background: #eab308; color: black; }
+      .delete { background: #ef4444; }
+    </style>
+  </head>
+  <body>
 
-      <h2>🔐 Auth</h2>
-      <ul>
-        <li>POST /api/v1/auth/login</li>
-        <li>POST /api/v1/auth/register</li>
-      </ul>
+    <h1> Video Player API Documentation</h1>
 
-      <h2>🎬 Videos</h2>
-      <ul>
-        <li>GET /api/v1/videos</li>
-        <li>POST /api/v1/videos</li>
-      </ul>
+    <h2> Authentication</h2>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td class="method post">POST</td><td>/api/v1/users/register</td><td>Register new user</td></tr>
+      <tr><td class="method post">POST</td><td>/api/v1/users/login</td><td>User login</td></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/users/me</td><td>Get current user details</td></tr>
+    </table>
 
-      <h2>👤 Users</h2>
-      <ul>
-        <li>GET /api/v1/users/profile</li>
-      </ul>
+    <h2> Videos</h2>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td class="method post">POST</td><td>/api/v1/videos/upload</td><td>Upload video (editor/admin only)</td></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/videos</td><td>Get all organization videos</td></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/videos/filter</td><td>Filter videos (status, search, sort)</td></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/videos/:id</td><td>Get specific video details</td></tr>
+      <tr><td class="method delete">DELETE</td><td>/api/v1/videos/:id</td><td>Delete video (owner/admin only)</td></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/videos/stream/:id</td><td>Stream video with range support</td></tr>
+    </table>
 
-    </body>
-    </html>
+    <h2> Admin (Admin Only)</h2>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/admin/users</td><td>Get all organization users</td></tr>
+      <tr><td class="method patch">PATCH</td><td>/api/v1/admin/users/:id/role</td><td>Update user role</td></tr>
+      <tr><td class="method delete">DELETE</td><td>/api/v1/admin/users/:id</td><td>Delete user</td></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/admin/videos</td><td>Get all organization videos</td></tr>
+      <tr><td class="method get">GET</td><td>/api/v1/admin/stats</td><td>Get system statistics</td></tr>
+    </table>
+
+  </body>
+  </html>
   `);
 });
 
