@@ -10,15 +10,47 @@ import { app } from "./app.js";
 
 import http from "http";
 import { Server  } from "socket.io";
+import jwt from "jsonwebtoken";
 
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: process.env.CORS_ORIGIN || "*",
+        credentials: true
     },
 });
+
+io.on("connection", (Socket) => {
+    console.log("New client connected:", Socket.id);
+
+    const token = socket.handshake.auth.token;
+
+    if(!token) {
+        console.log("NO token provided, disconnecting...");
+        socket.disconnect();
+        return;
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        socket.join(`user_${decoded._id}`);
+
+        socket.join(`org_${decoded.organizationId}`);
+
+        console.log(`User ${decoded.id} joined rooms: user_${decoded.id}, org_${decoded.organizationId}`);
+
+        socket.on("disconnect", () => {
+            console.log("Client disconnected:", socket.id);
+        });
+
+    } catch (error) {
+        console.log("Invalid token, disconnecting...");
+        socket.disconnect();
+    }
+})
 
 app.set("io", io);
 

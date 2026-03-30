@@ -27,9 +27,11 @@ export const verifyJWT = async(req, res, next) => {
 
            req.user = user;
            next();
+
     } catch (error) {
         return res.status(401).json({
-              message: "Invalid access Token"
+              success: false,
+              message: error.name === "TokenExpiredError" ? "Token expired. please login again": "Invalid access Token"
              });
     }
 };

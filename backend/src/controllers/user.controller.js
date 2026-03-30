@@ -5,10 +5,10 @@ import bcrypt from "bcryptjs";
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, organizationId, role } = req.body;
 
         
-        if( !name || !email || !password) {
+        if( !name || !email || !password || !organizationId) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required"
@@ -22,18 +22,32 @@ const registerUser = async (req, res) => {
                 message: "User already exits"
             });
         }
+        
+        const validRoles = ["viewer", "editor", "admin"];
+        if (role && !validRoles.includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid role. Must be viewer, editor or admin"
+            });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 12 );
            
         const user =await  User.create({
             name: name,
             email: email,
-            password: hashedPassword
+            password: hashedPassword,
+            organizationId: organizationId,
+            role: role || "viewer"
            });
            
 
            const token = jwt.sign(
-            {id: user._id },
+            { 
+                id: user._id,
+                role: user.role,
+                organizationId: user.organizationId
+            },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
            );
@@ -45,8 +59,10 @@ const registerUser = async (req, res) => {
             user:{
                 id: user._id,
                 name: user.name,
-                email: user.email
-            },
+                email: user.email,
+                role: user.role,
+                organizationId: user.organizationId
+             },
            });
     } catch (error) {
         console.error(error);
@@ -88,7 +104,11 @@ const loginUser = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id:user._id },
+            { 
+                id:user._id,
+                role: user.role,
+                organizationId: user.organizationId
+            },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
@@ -101,6 +121,8 @@ const loginUser = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
+                organizationId: user.organizationId
             },
         });
     } catch (error) {
@@ -111,4 +133,24 @@ const loginUser = async (req, res) => {
     }
 };
 
-export  { registerUser, loginUser };
+const getCurrentUser = async (req, res) => {
+    try {
+        return res.status(200).json({
+            success: true,
+            user: {
+                id: req.user._id,
+                name: req.user.name,
+                email: req.user.email,
+                role: req.user.role,
+                organizationId: req.user.organizationId
+            }
+        });
+    } catch (error) {
+         return res.status(500).json({
+            success: false,
+            message: "server error"
+         });   
+    }
+};
+
+export  { registerUser, loginUser, getCurrentUser };

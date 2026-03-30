@@ -1,5 +1,4 @@
-import mongoose,{mongo, Schema} from "mongoose";
-import jwt from "jsonwebtoken";
+import mongoose,{ Schema} from "mongoose";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
@@ -24,6 +23,17 @@ const userSchema = new Schema(
         password: {
             type: String,
             required: true,
+        },
+        role: {
+            type: String,
+            enum: ["viewer", "editor", "admin"],
+            default: "viewer",
+            required: true
+        },
+        organizationId: {
+            type: String,
+            required: true,
+            index: true
         }
     }, {timestamps: true}
 );
