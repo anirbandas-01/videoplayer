@@ -1,5 +1,5 @@
 import multer from "multer";
-
+import path from "path";
 
 const ALLOWED_VIDEO_TYPES = [
     "video/mp4",
@@ -13,7 +13,7 @@ const ALLOWED_VIDEO_TYPES = [
 const MAX_FILE_SIZE = 500 * 1024 * 1024;
 
 const storage = multer.diskStorage({
-    destination: function(req, res, cb) {
+    destination: function(req, file, cb) {
         cb(null, "uploads/");
     },
     filename: function (req, file, cb) {
@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
     },
 });
 
-const filleFilter = (req, file, cb) => {
+const fileFilter = (req, file, cb) => {
     if(ALLOWED_VIDEO_TYPES.includes(file.mimetype)) {
         cb(null, true);
     }else {
