@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../Layout/Navbar';
+import Sidebar from '../Layout/Sidebar';
 import VideoUpload from '../video/VideoUpload';
 import VideoList from '../video/VideoList';
 import VideoPlayer from '../video/VideoPlayer';
@@ -12,7 +13,7 @@ const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
-  const [activeView, setActiveView] = useState('videos'); // 'videos' or 'admin'
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const videoId = searchParams.get('video');
@@ -31,75 +32,61 @@ const Dashboard = () => {
     setSearchParams(searchParams);
   };
 
+  const handleSidebarToggle = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleCloseSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   const canUpload = user?.role === 'editor' || user?.role === 'admin';
-  const isAdmin = user?.role === 'admin';
+  const view = searchParams.get('view') || 'all';
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome, {user?.name}!
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Role: <span className="font-semibold capitalize">{user?.role}</span> | 
-              Organization: <span className="font-semibold">{user?.organizationId}</span>
-            </p>
-          </div>
+      <Navbar onMenuClick={handleSidebarToggle} />
+      
+      <div className="flex pt-16">
+        {/* Sidebar */}
+        <Sidebar isOpen={sidebarOpen} onClose={handleCloseSidebar} />
 
-          
-          {isAdmin && (
-            <div className="mb-6 border-b border-gray-200">
-              <nav className="flex -mb-px space-x-8">
-                <button
-                  onClick={() => setActiveView('videos')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeView === 'videos'
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Videos
-                </button>
-                <button
-                  onClick={() => setActiveView('admin')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeView === 'admin'
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Admin Panel
-                </button>
-              </nav>
+        {/* Main Content */}
+        <main className="flex-1 overflow-x-hidden">
+          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-900">
+                Welcome, {user?.name}!
+              </h1>
+              <p className="mt-2 text-gray-600">
+                Role: <span className="font-semibold capitalize">{user?.role}</span> | 
+                Organization: <span className="font-semibold">{user?.organizationId}</span>
+              </p>
             </div>
-          )}
 
-          
-          {activeView === 'videos' ? (
-            <>
-              
-              {canUpload && (
-                <VideoUpload onUploadSuccess={handleUploadSuccess} />
-              )}
+            {/* Content based on view */}
+            {view === 'admin' || view === 'users' || view === 'stats' ? (
+              <AdminPanel />
+            ) : view === 'upload' && canUpload ? (
+              <VideoUpload onUploadSuccess={handleUploadSuccess} />
+            ) : (
+              <>
+                {canUpload && view === 'all' && (
+                  <VideoUpload onUploadSuccess={handleUploadSuccess} />
+                )}
+                <VideoList refreshTrigger={refreshTrigger} />
+              </>
+            )}
 
-              
-              <VideoList refreshTrigger={refreshTrigger} />
-            </>
-          ) : (
-            <AdminPanel />
-          )}
-
-          
-          {selectedVideoId && (
-            <VideoPlayer
-              videoId={selectedVideoId}
-              onClose={handleClosePlayer}
-            />
-          )}
-        </div>
+            {/* Video Player Modal */}
+            {selectedVideoId && (
+              <VideoPlayer
+                videoId={selectedVideoId}
+                onClose={handleClosePlayer}
+              />
+            )}
+          </div>
+        </main>
       </div>
     </div>
   );
